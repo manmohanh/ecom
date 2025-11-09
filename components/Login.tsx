@@ -14,13 +14,29 @@ const Login = () => {
   const [loading, setLoding] = useState(false);
   const router = useRouter();
 
-  const login = (value: any) => {
-    const payload = {
-      ...value,
-      redirect: true,
-      callbackUrl: "/",
-    };
-    signIn("credentials", payload);
+  const login = async (value: any) => {
+
+    try {
+      const payload = {
+        ...value,
+        redirect: false,
+      };
+      signIn("credentials", payload);
+      const session = await getSession()
+      if(!session)
+        throw new Error("Failed to login user")
+
+      if(session.user.role === "user"){
+        return router.replace("/user/orders")
+      }
+
+         if(session.user.role === "admin"){
+        return router.replace("/admin/orders")
+      }
+      
+    } catch (error) {
+      clientCatchError(error)
+    }
   };
 
   const signInWithGoogle = async () => {

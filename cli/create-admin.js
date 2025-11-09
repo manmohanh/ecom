@@ -85,7 +85,7 @@ const exitApp = () => {
 const main = async () => {
   let db = null;
 
-  MongoClient.connect(process.env.DB)
+  MongoClient.connect(process.env.DB_URL)
     .then((conn) => {
       db = conn.db(process.env.DB_NAME);
       welcome(db);

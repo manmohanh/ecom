@@ -1,4 +1,4 @@
-const db=`${process.env.DB}/${process.env.DB_NAME}`
+const db=`${process.env.DB_URL}/${process.env.DB_NAME}`
 import mongoose from "mongoose";
 mongoose.connect(db);
 
