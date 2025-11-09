@@ -13,7 +13,7 @@ import {
 } from "@ant-design/icons";
 import { usePathname } from "next/navigation";
 import { Avatar, Dropdown } from "antd";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const menus = [
   {
@@ -34,34 +34,38 @@ const menus = [
   },
 ];
 
-const accountMenu = {
-  items: [
-    {
-      icon: <ProfileOutlined />,
-      label: <a>Manmohan Hansda</a>,
-      key: "fullname",
-    },
-    {
-      icon: <SettingOutlined />,
-      label: <a>Settings</a>,
-      key: "settings",
-    },
-    {
-      icon: <LoginOutlined />,
-      label: <a>Logout</a>,
-      key: "logout",
-    },
-  ],
-};
-
 const Layout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
 
   const session = useSession();
 
+  const logout = async () => {
+    await signOut();
+  };
+
   const blacklists = ["/admin", "/login", "/signup", "/user"];
 
   const isBlacklist = blacklists.some((path) => pathname.startsWith(path));
+
+  const accountMenu = {
+    items: [
+      {
+        icon: <ProfileOutlined />,
+        label: <a>Manmohan Hansda</a>,
+        key: "fullname",
+      },
+      {
+        icon: <SettingOutlined />,
+        label: <a>Settings</a>,
+        key: "settings",
+      },
+      {
+        icon: <LoginOutlined />,
+        label: <a onClick={logout}>Logout</a>,
+        key: "logout",
+      },
+    ],
+  };
 
   if (isBlacklist) {
     return (

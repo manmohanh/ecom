@@ -1,10 +1,12 @@
+const db=`${process.env.DB}/${process.env.DB_NAME}`
 import mongoose from "mongoose";
-mongoose.connect(process.env.DB!);
+mongoose.connect(db);
 
 import serverCatchError from "@/lib/server-catch-error";
 import { NextRequest, NextResponse as res } from "next/server";
 import UserModel from "@/models/user.model";
 import bcrypt from "bcrypt";
+
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -19,7 +21,7 @@ export const POST = async (req: NextRequest) => {
       id: user._id,
       name: user.fullname,
       email: user.email,
-      gender: "male",
+      role: user.role,
     };
 
     if (provider === "google") return res.json(payload);

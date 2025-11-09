@@ -15,6 +15,7 @@ import Link from "next/link";
 import ChildrenInterface from "@/interface/children.interface";
 import Logo from "../shared/Logo";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 const { Sider, Content, Header } = Layout;
 
@@ -39,6 +40,10 @@ const siderStyle: React.CSSProperties = {
 
 const AdminLayout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
+
+    const logout = async () => {
+      await signOut();
+    };
 
   const menus = [
     {
@@ -77,7 +82,7 @@ const AdminLayout: FC<ChildrenInterface> = ({ children }) => {
       },
       {
         icon: <LoginOutlined />,
-        label: <a>Logout</a>,
+        label: <a onClick={logout}>Logout</a>,
         key: "logout",
       },
     ],

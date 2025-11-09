@@ -1,19 +1,8 @@
-import NextAuth, { NextAuthOptions, Session, User } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 
-interface CustomSessionInterface extends Session {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
-
-interface CustomUserInterface extends User {
-  gender:string
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -54,13 +43,11 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
 
-
-
       if (account?.provider) {
-        const customUser = user as CustomUserInterface
+        
         try {
           const payload = {
-            email: customUser?.email,
+            email: user?.email,
             provider:'google'
           };
           const { data } = await axios.post(
@@ -68,10 +55,10 @@ export const authOptions: NextAuthOptions = {
             payload
           );
 
-          customUser.id = data.id
-          customUser.email = data.email
-          customUser.name = data.name
-          customUser.gender = data.gender
+          user.id = data.id
+          user.email = data.email
+          user.name = data.name
+          user.role = data.role
           return true;
         } catch (error) {
           return false;
@@ -87,11 +74,12 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      const customSession = session as CustomSessionInterface;
+
       if (token) {
-        customSession.user.id = token.id as string;
+        session.user.id = token.id as string
+        session.user.role = token.role as string
       }
-      return customSession;
+      return session;
     },
   },
   secret:process.env.NEXTAUTH_SECRET
