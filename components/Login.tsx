@@ -5,12 +5,35 @@ import Logo from "./shared/Logo";
 import { ArrowRightOutlined, GoogleOutlined } from "@ant-design/icons";
 import "@ant-design/v5-patch-for-react-19";
 import Link from "next/link";
+import { getSession, signIn } from "next-auth/react";
+import { useState } from "react";
+import clientCatchError from "@/lib/client-catch-error";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const login = (values: any) => {
+  const [loading, setLoding] = useState(false);
+  const router = useRouter();
+
+  const login = (value: any) => {
+    const payload = {
+      ...value,
+      redirect: true,
+      callbackUrl: "/",
+    };
+    signIn("credentials", payload);
+  };
+
+  const signInWithGoogle = async () => {
     try {
-      console.log(values);
-    } catch (error) {}
+      const payload = {
+        redirect: true,
+        callbackUrl: "/",
+      };
+
+      await signIn("google", payload);
+    } catch (error) {
+      clientCatchError(error);
+    }
   };
 
   return (
@@ -32,7 +55,6 @@ const Login = () => {
               <Logo />
             </div>
             <Form layout="vertical" onFinish={login}>
-        
               <Form.Item
                 label="Email"
                 name="email"
@@ -65,14 +87,22 @@ const Login = () => {
                   type="primary"
                   icon={<ArrowRightOutlined />}
                   className="bg-violet-500! hover:bg-violet-600!"
-    
                 >
                   Sign in
                 </Button>
               </Form.Item>
             </Form>
-            <Divider/>
-            <Button icon={<GoogleOutlined/>} size="large" className="w-full" type="primary" danger>Signin with Google</Button>
+            <Divider />
+            <Button
+              onClick={signInWithGoogle}
+              icon={<GoogleOutlined />}
+              size="large"
+              className="w-full"
+              type="primary"
+              danger
+            >
+              Signin with Google
+            </Button>
             <div className="flex gap-2">
               <p className="text-gray-500">Don't have an account ?</p>
               <Link href={"/signup"} className="hover:underline">

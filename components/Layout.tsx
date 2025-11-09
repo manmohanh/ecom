@@ -5,8 +5,15 @@ import ChildrenInterface from "@/interface/children.interface";
 import "animate.css";
 import Logo from "./shared/Logo";
 import Link from "next/link";
-import { UserAddOutlined } from "@ant-design/icons";
+import {
+  LoginOutlined,
+  ProfileOutlined,
+  SettingOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import { usePathname } from "next/navigation";
+import { Avatar, Dropdown } from "antd";
+import { useSession } from "next-auth/react";
 
 const menus = [
   {
@@ -27,10 +34,32 @@ const menus = [
   },
 ];
 
+const accountMenu = {
+  items: [
+    {
+      icon: <ProfileOutlined />,
+      label: <a>Manmohan Hansda</a>,
+      key: "fullname",
+    },
+    {
+      icon: <SettingOutlined />,
+      label: <a>Settings</a>,
+      key: "settings",
+    },
+    {
+      icon: <LoginOutlined />,
+      label: <a>Logout</a>,
+      key: "logout",
+    },
+  ],
+};
+
 const Layout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
 
-  const blacklists = ["/admin", "/login", "/signup","/user"];
+  const session = useSession();
+
+  const blacklists = ["/admin", "/login", "/signup", "/user"];
 
   const isBlacklist = blacklists.some((path) => pathname.startsWith(path));
 
@@ -57,13 +86,22 @@ const Layout: FC<ChildrenInterface> = ({ children }) => {
             </Link>
           ))}
 
-          <Link
-            href={"/signup"}
-            className="py-6 px-12 hover:bg-rose-600 font-medium hover:text-white bg-rose-500 text-white"
-          >
-            <UserAddOutlined className="mr-3" />
-            Sign up
-          </Link>
+          {session ? (
+            <Dropdown menu={accountMenu}>
+              <Avatar
+                src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
+                size={"large"}
+              />
+            </Dropdown>
+          ) : (
+            <Link
+              href={"/signup"}
+              className="py-6 px-12 hover:bg-rose-600 font-medium hover:text-white bg-rose-500 text-white"
+            >
+              <UserAddOutlined className="mr-3" />
+              Sign up
+            </Link>
+          )}
         </div>
       </nav>
       <div className="w-9/12 mx-auto py-24">{children}</div>

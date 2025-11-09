@@ -5,12 +5,21 @@ import Logo from "./shared/Logo";
 import { UserAddOutlined } from "@ant-design/icons";
 import "@ant-design/v5-patch-for-react-19";
 import Link from "next/link";
+import clientCatchError from "@/lib/client-catch-error";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
-  const signup = (values: any) => {
+
+  const router = useRouter()
+
+  const signup = async (value: any) => {
     try {
-      console.log(values);
-    } catch (error) {}
+      await axios.post("/api/user/signup",value)
+      router.push("/login")
+    } catch (error) {
+      clientCatchError(error)
+    }
   };
 
   return (
