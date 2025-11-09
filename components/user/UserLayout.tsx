@@ -14,9 +14,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { getBreadCrumbs } from "../admin/AdminLayout";
+import { signOut } from "next-auth/react";
 
 const UserLayout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
+
+  const logout = async () => {
+    await signOut();
+  };
 
   const menus = [
     {
@@ -47,7 +52,9 @@ const UserLayout: FC<ChildrenInterface> = ({ children }) => {
           <div className="flex flex-col">
             <h1 className="text-lg text-white font-medium">Manmohan Hansda</h1>
             <p className="text-gray-300 mb-3">email@gmail.com</p>
-            <Button icon={<LogoutOutlined />}>Logout</Button>
+            <Button onClick={logout} icon={<LogoutOutlined />}>
+              Logout
+            </Button>
           </div>
         </div>
       </Sider>
