@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 
-
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -35,30 +34,30 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/login",
-    error:"/auth-failed"
+    error: "/auth-failed",
   },
   session: {
     strategy: "jwt",
   },
   callbacks: {
     async signIn({ user, account }) {
-
       if (account?.provider) {
-        
         try {
           const payload = {
             email: user?.email,
-            provider:'google'
+            provider: "google",
           };
           const { data } = await axios.post(
             `${process.env.SERVER}/api/user/login`,
             payload
           );
 
-          user.id = data.id
-          user.email = data.email
-          user.name = data.name
-          user.role = data.role
+          console.log(data);
+
+          user.id = data.id;
+          user.email = data.email;
+          user.name = data.name;
+          user.role = data.role;
           return true;
         } catch (error) {
           return false;
@@ -70,19 +69,19 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-
       if (token) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
   },
-  secret:process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);

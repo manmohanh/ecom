@@ -1,11 +1,11 @@
 import { getToken } from "next-auth/jwt";
 import {
-  MiddlewareConfig,
+  ProxyConfig,
   NextRequest,
   NextResponse as res,
 } from "next/server";
 
-export const middleware = async (req: NextRequest) => {
+export const proxy = async (req: NextRequest) => {
   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
   const adminPanel = pathname.startsWith("/admin");
@@ -35,6 +35,6 @@ export const middleware = async (req: NextRequest) => {
   return res.next()
 };
 
-export const config: MiddlewareConfig = {
+export const config: ProxyConfig = {
   matcher: ["/login", "/signup", "/user/:path*", "/admin/:path*"],
 };

@@ -1,14 +1,21 @@
 "use client";
+import fetcher from "@/lib/fetcher";
 import { Card, Skeleton } from "antd";
+import moment from "moment";
 import Image from "next/image";
+import useSWR from "swr";
 
 const Users = () => {
+  const { data, error, isLoading } = useSWR("/api/user", fetcher);
+
+  console.log(data)
+
   return (
     <div className="grid grid-cols-4 gap-8">
-        <Skeleton active={false} className="col-span-4"/>
-      {Array(16)
-        .fill(0)
-        .map((item, index) => (
+      {isLoading && <Skeleton active className="col-span-4"/>}
+      {error && <div>{error.message}</div>}
+      {
+        data.map((item: any, index: number) => (
           <Card key={index} hoverable>
             <div className="flex flex-col items-center">
               <Image
@@ -19,8 +26,8 @@ const Users = () => {
                 objectFit="cover"
                 className="rounded-full"
               />
-              <Card.Meta title="Rohan Kumar" description="email@gmail.com" />
-              <label className="text-gray-500 font-medium">Jan 3,2024</label>
+              <Card.Meta title={item.fullname} description={item.email} />
+              <label className="text-gray-500 font-medium mt-1">{moment(item.createdAt).format('MMM DD,YYYY hh:mm A')}</label>
             </div>
           </Card>
         ))}

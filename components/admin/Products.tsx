@@ -70,7 +70,6 @@ const Products = () => {
   };
 
   const createProduct = async (values: any) => {
-    console.log(values);
     try {
       values.image = values.image.file.originFileObj;
       const formData = new FormData();

@@ -1,4 +1,4 @@
-const db=`${process.env.DB_URL}/${process.env.DB_NAME}`
+const db = `${process.env.DB_URL}/${process.env.DB_NAME}`;
 import mongoose from "mongoose";
 mongoose.connect(db);
 
@@ -6,7 +6,6 @@ import serverCatchError from "@/lib/server-catch-error";
 import { NextRequest, NextResponse as res } from "next/server";
 import UserModel from "@/models/user.model";
 import bcrypt from "bcrypt";
-
 
 export const POST = async (req: NextRequest) => {
   try {

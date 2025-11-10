@@ -23,6 +23,7 @@ const Login = () => {
       };
       signIn("credentials", payload);
       const session = await getSession()
+      console.log(session)
       if(!session)
         throw new Error("Failed to login user")
 
