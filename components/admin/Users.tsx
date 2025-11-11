@@ -15,7 +15,7 @@ const Users = () => {
       {isLoading && <Skeleton active className="col-span-4"/>}
       {error && <div>{error.message}</div>}
       {
-        data.map((item: any, index: number) => (
+        data && data.map((item: any, index: number) => (
           <Card key={index} hoverable>
             <div className="flex flex-col items-center">
               <Image

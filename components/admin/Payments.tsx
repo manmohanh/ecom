@@ -1,76 +1,32 @@
 "use client";
 
-import { Avatar, Select, Skeleton, Table } from "antd";
+import fetcher from "@/lib/fetcher";
+import { Avatar, Skeleton, Table, Tag } from "antd";
 import moment from "moment";
-
-const data = [
-  {
-    orderId: "ORD1001",
-    userId: "USR001",
-    product: {
-      productId: "P001",
-      productName: "Wireless Mouse",
-      quantity: 2,
-      price: 29.99,
-    },
-    totalAmount: 59.98,
-    status: "pending",
-    createdAt: "2025-06-05T10:00:00Z",
-  },
-  {
-    orderId: "ORD1002",
-    userId: "USR002",
-    product: {
-      productId: "P003",
-      productName: "Bluetooth Headphones",
-      quantity: 1,
-      price: 59.99,
-    },
-    totalAmount: 59.99,
-    status: "success",
-    createdAt: "2025-06-04T12:45:00Z",
-  },
-  {
-    orderId: "ORD1003",
-    userId: "USR003",
-    product: {
-      productId: "P002",
-      productName: "USB-C Charger",
-      quantity: 3,
-      price: 29.99,
-    },
-    totalAmount: 89.97,
-    status: "error",
-    createdAt: "2025-06-03T14:30:00Z",
-  },
-  {
-    orderId: "ORD1004",
-    userId: "USR004",
-    product: {
-      productId: "P004",
-      productName: "Laptop Stand",
-      quantity: 1,
-      price: 49.99,
-    },
-    totalAmount: 49.99,
-    status: "warning",
-    createdAt: "2025-06-02T16:00:00Z",
-  },
-];
+import useSWR from "swr";
 
 const Payments = () => {
+
+  const {data,error,isLoading} = useSWR('/api/payment',fetcher)
+
+  if(isLoading)
+    return <Skeleton active/>
+
+  if(error)
+    return <h1>{error.message}</h1>
+
   const columns = [
     {
       title: "Customer",
       key: "customer",
-      render: () => (
+      render: (item:any) => (
         <div className="flex gap-3 items-center">
           <Avatar size={"large"} className="bg-orange-500!">
-            M
+            {item.user.fullname[0]}
           </Avatar>
           <div className="flex flex-col">
-            <h1 className="font-medium">Manmohan</h1>
-            <label className="text-gray-500">email@gmail.com</label>
+            <h1 className="font-medium">{item.user.fullname}</h1>
+            <label className="text-gray-500">{item.user.email}</label>
           </div>
         </div>
       ),
@@ -78,30 +34,20 @@ const Payments = () => {
     {
       title: "Product",
       key: "product",
-      render: (item: any) => <label>{item.product.productName}</label>,
+      render: (item: any) => <label>{item.order.product.title}</label>,
     },
     {
-      title: "Price",
-      key: "price",
-      render: (item: any) => <label>{"₹ " + item.product.price}</label>,
+      title: "Amount",
+      key: "amount",
+      render: (item: any) => <label>{"₹ " + item.order.price}</label>,
     },
     {
-      title:"Address",
-      key:'address',
-      render:()=>(
-        <label>Dumka,Jharkhand</label>
-      )
-    },
-    {
-      title: "Status",
-      key: "status",
-      render: () => (
-        <Select placeholder="Status" style={{ width: 150 }}>
-          <Select.Option value="processing">Processing</Select.Option>
-          <Select.Option value="dispatched">Dispatched</Select.Option>
-          <Select.Option value="returned">Returned</Select.Option>
-        </Select>
-      ),
+      title:'Vendor',
+      key:'vendor',
+
+      render:(item:any)=>{
+        <Tag>{item.vendor}</Tag>
+      }
     },
     {
       title:"Date",
@@ -114,8 +60,7 @@ const Payments = () => {
 
   return (
     <div>
-      {/* <Skeleton active/> */}
-      <Table columns={columns} dataSource={data} />
+      <Table columns={[]} dataSource={data} rowKey={"_id"}/>
     </div>
   );
 };

@@ -15,28 +15,25 @@ const Login = () => {
   const router = useRouter();
 
   const login = async (value: any) => {
-
     try {
       const payload = {
         ...value,
         redirect: false,
       };
       signIn("credentials", payload);
-      const session = await getSession()
-      console.log(session)
-      if(!session)
-        throw new Error("Failed to login user")
+      const session = await getSession();
 
-      if(session.user.role === "user"){
-        return router.replace("/user/orders")
+      if (!session) throw new Error("Failed to login user");
+
+      if (session.user.role === "user") {
+        return router.replace("/user/orders");
       }
 
-         if(session.user.role === "admin"){
-        return router.replace("/admin/orders")
+      if (session.user.role === "admin") {
+        return router.replace("/admin/orders");
       }
-      
     } catch (error) {
-      clientCatchError(error)
+      clientCatchError(error);
     }
   };
 

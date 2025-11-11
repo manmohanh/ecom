@@ -86,11 +86,9 @@ const Orders = () => {
       render: (item: any) => <label>{"₹ " + item.product.price}</label>,
     },
     {
-      title:"Address",
-      key:'address',
-      render:()=>(
-        <label>Dumka,Jharkhand</label>
-      )
+      title: "Address",
+      key: "address",
+      render: () => <label>Dumka,Jharkhand</label>,
     },
     {
       title: "Status",
@@ -104,18 +102,17 @@ const Orders = () => {
       ),
     },
     {
-      title:"Date",
-      key:"date",
-      render:(item:any)=>(
+      title: "Date",
+      key: "date",
+      render: (item: any) => (
         <label>{moment(item.createdAt).format("MMM DD, YYYY hh:mm A")}</label>
-      )
-    }
+      ),
+    },
   ];
 
   return (
     <div>
-      {/* <Skeleton active/> */}
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={data} rowKey={"orderId"} />
     </div>
   );
 };
