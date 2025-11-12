@@ -7,13 +7,16 @@ import Logo from "./shared/Logo";
 import Link from "next/link";
 import {
   LoginOutlined,
-  ProfileOutlined,
   SettingOutlined,
+  ShoppingCartOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { usePathname } from "next/navigation";
-import { Avatar, Dropdown } from "antd";
+import { Avatar, Badge, Dropdown, Tooltip } from "antd";
 import { signOut, useSession } from "next-auth/react";
+import useSWR from "swr";
+import fetcher from "@/lib/fetcher";
 
 const menus = [
   {
@@ -24,14 +27,6 @@ const menus = [
     label: "Products",
     href: "/products",
   },
-  {
-    label: "Carts",
-    href: "/carts",
-  },
-  {
-    label: "Sign In",
-    href: "/login",
-  },
 ];
 
 const Layout: FC<ChildrenInterface> = ({ children }) => {
@@ -39,32 +34,58 @@ const Layout: FC<ChildrenInterface> = ({ children }) => {
 
   const session = useSession();
 
-  const logout = async () => {
-    await signOut();
-  };
+  const { data } = useSWR("/api/cart?count=true", fetcher);
 
   const blacklists = ["/admin", "/login", "/signup", "/user"];
 
   const isBlacklist = blacklists.some((path) => pathname.startsWith(path));
 
-  const accountMenu = {
+  const userMenu = {
     items: [
       {
-        icon: <ProfileOutlined />,
-        label: <a>Manmohan Hansda</a>,
+        icon: <UserOutlined />,
+        label: <Link href={"/user/orders"}>{session.data?.user.name}</Link>,
         key: "fullname",
       },
       {
         icon: <SettingOutlined />,
-        label: <a>Settings</a>,
+        label: <Link href={"/user/settings"}>Settings</Link>,
         key: "settings",
       },
       {
         icon: <LoginOutlined />,
-        label: <a onClick={logout}>Logout</a>,
+        label: <a onClick={() => signOut()}>Logout</a>,
         key: "logout",
       },
     ],
+  };
+
+  const adminMenu = {
+    items: [
+      {
+        icon: <UserOutlined />,
+        label: <Link href={"/admin/orders"}>{session.data?.user.name}</Link>,
+        key: "fullname",
+      },
+      {
+        icon: <SettingOutlined />,
+        label: <Link href={"/admin/settings"}>Settings</Link>,
+        key: "settings",
+      },
+      {
+        icon: <LoginOutlined />,
+        label: <a onClick={() => signOut()}>Logout</a>,
+        key: "logout",
+      },
+    ],
+  };
+
+  const getMenu = (role: string) => {
+    if (role === "user") return userMenu;
+
+    if (role === "admin") return adminMenu;
+
+    signOut();
   };
 
   if (isBlacklist) {
@@ -90,21 +111,42 @@ const Layout: FC<ChildrenInterface> = ({ children }) => {
             </Link>
           ))}
 
-          {session ? (
-            <Dropdown menu={accountMenu}>
-              <Avatar
-                src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
-                size={"large"}
-              />
-            </Dropdown>
-          ) : (
-            <Link
-              href={"/signup"}
-              className="py-6 px-12 hover:bg-rose-600 font-medium hover:text-white bg-rose-500 text-white"
-            >
-              <UserAddOutlined className="mr-3" />
-              Sign up
-            </Link>
+          {!session.data && (
+            <div className="flex animate__animated animate__fadeIn gap-10">
+              <Link
+                href={"/login"}
+                className="py-6 px-12  font-base hover:bg-blue-500 hover:text-white"
+              >
+                Sign in
+              </Link>
+
+              <Link
+                href={"/signup"}
+                className="py-6 px-12 hover:bg-rose-600 font-medium hover:text-white bg-rose-500 text-white flex gap-2"
+              >
+                <UserAddOutlined />
+                Sign up
+              </Link>
+            </div>
+          )}
+          {session.data && (
+            <div className="flex items-center gap-12 animate__animated animate__fadeIn ml-8">
+              {session.data.user.role === "user" && (
+                <Tooltip title="Your cart">
+                  <Link href={"/user/carts"}>
+                    <Badge count={data && data.count}>
+                      <ShoppingCartOutlined className="text-3xl" />
+                    </Badge>
+                  </Link>
+                </Tooltip>
+              )}
+              <Dropdown menu={getMenu(session.data.user.role)}>
+                <Avatar
+                  src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
+                  size={"large"}
+                />
+              </Dropdown>
+            </div>
           )}
         </div>
       </nav>

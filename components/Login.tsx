@@ -26,7 +26,7 @@ const Login = () => {
       if (!session) throw new Error("Failed to login user");
 
       if (session.user.role === "user") {
-        return router.replace("/user/orders");
+        return router.replace("/");
       }
 
       if (session.user.role === "admin") {

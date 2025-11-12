@@ -14,10 +14,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { getBreadCrumbs } from "../admin/AdminLayout";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const UserLayout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
+
+  const session = useSession();
 
   const logout = async () => {
     await signOut();
@@ -47,11 +49,13 @@ const UserLayout: FC<ChildrenInterface> = ({ children }) => {
         <Menu theme="light" mode="inline" items={menus} className="h-full" />
         <div className="bg-indigo-900 p-4 fixed bottom-0 left-0 w-[300px] flex items-center gap-3">
           <Avatar className="h-16! w-16! bg-orange-800! text-2xl! font-medium!">
-            M
+            {session.data?.user.name?.charAt(0)}
           </Avatar>
           <div className="flex flex-col">
-            <h1 className="text-lg text-white font-medium">Manmohan Hansda</h1>
-            <p className="text-gray-300 mb-3">email@gmail.com</p>
+            <h1 className="text-lg text-white font-medium">
+              {session.data?.user.name}
+            </h1>
+            <p className="text-gray-300 mb-3">{session.data?.user.email}</p>
             <Button onClick={logout} icon={<LogoutOutlined />}>
               Logout
             </Button>
