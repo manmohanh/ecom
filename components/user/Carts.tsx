@@ -2,15 +2,24 @@
 import clientCatchError from "@/lib/client-catch-error";
 import fetcher from "@/lib/fetcher";
 import calculatePrice from "@/lib/price-calculate";
+import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Empty, Skeleton, Space } from "antd";
 import axios from "axios";
 import Image from "next/image";
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
+import { useSession } from "next-auth/react";
+
+interface ModifiedRazorpayInterface extends RazorpayOrderOptions {
+  notes: any;
+}
 
 const Carts = () => {
+  const session = useSession();
   const { data, error, isLoading } = useSWR("/api/cart", fetcher);
+
+  const { Razorpay } = useRazorpay();
 
   const [loading, setLoading] = useState({
     state: false,
@@ -59,17 +68,77 @@ const Carts = () => {
     }
   };
 
-  const getTotalAmout = (data: any) => {
+  const getTotalAmout = () => {
     let sum = 0;
     for (let item of data) {
-      const amount = calculatePrice(item.product.price, item.product.discount) * item.qnt
+      const amount =
+        calculatePrice(item.product.price, item.product.discount) * item.qnt;
       sum = sum + amount;
     }
+
     return sum;
   };
 
-  if(data.length === 0)
-    return <Empty/>
+  const getOrderPayload = () => {
+    const products = [];
+    const prices = [];
+    const discounts = [];
+
+    for (let item of data) {
+      products.push(item.product._id);
+      prices.push(item.product.price);
+      discounts.push(item.product.discount);
+    }
+
+    return {
+      products,
+      prices,
+      discounts,
+    };
+  };
+
+  const payNow = async () => {
+    try {
+      if (!session.data) throw new Error("Session not intialized");
+
+      const payload = {
+        amount: getTotalAmout(),
+      };
+      const { data } = await axios.post("/api/razorpay/order", payload);
+      console.log(data);
+      const options: ModifiedRazorpayInterface = {
+        name: "Ecom shops",
+        description: "Bulk prodcut",
+        amount: data.amount,
+        order_id: data.id,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        currency: "INR",
+        prefill: {
+          name: session.data?.user.name as string,
+          email: session.data.user.email as string,
+        },
+        notes: {
+          name: session.data.user.name as string,
+          user: session.data.user.id,
+          ...getOrderPayload(),
+        },
+        handler: () => {
+          console.log("Success");
+        },
+      };
+      const rzp = new Razorpay(options);
+
+      rzp.on("payment.failed", () => {
+        console.log("failed");
+      });
+
+      rzp.open();
+    } catch (err) {
+      clientCatchError(err);
+    }
+  };
+
+  if (data.length === 0) return <Empty />;
 
   return (
     <div className="flex flex-col gap-12">
@@ -138,9 +207,9 @@ const Carts = () => {
       ))}
       <div className="flex justify-end items-center gap-6">
         <h1 className="text-2xl font-semibold">
-          Total Payable amount - ₹{getTotalAmout(data).toLocaleString()}
+          Total Payable amount - ₹{getTotalAmout().toLocaleString()}
         </h1>
-        <Button size="large" type="primary">
+        <Button onClick={payNow} size="large" type="primary">
           Pay now
         </Button>
       </div>
