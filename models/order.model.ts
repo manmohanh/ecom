@@ -9,19 +9,19 @@ const orderSchema = new Schema(
       ref: UserModel,
       required: true,
     },
-    product: {
+    products: [{
       type: mongoose.Types.ObjectId,
       ref: ProductModel,
       required: true,
-    },
-    price: {
+    }],
+    prices: [{
       type: Number,
       required: true,
-    },
-    discount: {
+    }],
+    discounts: [{
       type: Number,
       required: true,
-    },
+    }],
     status:{
         type:String,
         default:'processing',
