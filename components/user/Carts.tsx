@@ -120,7 +120,7 @@ const Carts = () => {
         notes: {
           name: session.data.user.name as string,
           user: session.data.user.id,
-          ...getOrderPayload(),
+          orders: JSON.stringify(getOrderPayload()),
         },
         handler: () => {
           console.log("Success");
