@@ -5,12 +5,15 @@ import { Button, Card, Empty } from "antd";
 import Image from "next/image";
 import { FC } from "react";
 import Pay from "./shared/Pay";
+import { useRouter } from "next/navigation";
 
 interface TitleInterface extends DataInterface {
   title: string;
 }
 
 const Slug: FC<DataInterface> = ({ data, title }) => {
+  const router = useRouter();
+
   if (!data) return <Empty />;
   return (
     <div>
@@ -31,7 +34,14 @@ const Slug: FC<DataInterface> = ({ data, title }) => {
               <del className="text-gray-500">₹{data.price}</del>
               <h1 className="text-rose-500">({data.discount}% Off)</h1>
             </div>
-            <Pay title="Buy now" product={data} theme="happy"/>
+            <Pay
+              title="Buy now"
+              product={data}
+              theme="happy"
+              onSuccess={() => {
+                router.push("/user/orders");
+              }}
+            />
           </div>
         </div>
       </Card>

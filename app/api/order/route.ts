@@ -36,13 +36,13 @@ export const GET = async (req: NextRequest) => {
     if (role === "user")
       orders = await OrderModel.find({ user: id })
         .sort({ createdAt: -1 })
-        .populate("product");
+        .populate("products");
 
     if (role === "admin")
       orders = await OrderModel.find()
         .sort({ createdAt: -1 }) 
         .populate("user", "fullname email mobile")
-        .populate("product");
+        .populate("products");
 
     return res.json(orders);
   } catch (error) {

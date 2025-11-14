@@ -2,10 +2,11 @@
 import clientCatchError from "@/lib/client-catch-error";
 import calculatePrice from "@/lib/price-calculate";
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
-import { Button } from "antd";
+import { Button, Modal, Result } from "antd";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { FC } from "react";
+import { FC, useState } from "react";
+import Link from "next/link";
 
 interface ModifiedRazorpayInterface extends RazorpayOrderOptions {
   notes: any;
@@ -51,6 +52,7 @@ const Pay: FC<PayInterface> = ({
   onFailed,
   theme = "happy",
 }) => {
+  const [open, setOpen] = useState(false);
   const isArray = Array.isArray(product);
   const session = useSession();
   const { Razorpay } = useRazorpay();
@@ -129,6 +131,7 @@ const Pay: FC<PayInterface> = ({
       const rzp = new Razorpay(options);
 
       rzp.on("payment.failed", (err: any) => {
+        setOpen(true)
         if (!onFailed) return;
 
         const payload = {
@@ -145,30 +148,42 @@ const Pay: FC<PayInterface> = ({
     }
   };
 
-  if (theme === "happy")
-    return (
-      <Button
-        onClick={payNow}
-        size="large"
-        type="primary"
-        className="font-medium! w-full! py-6! text-lg! bg-green-500! hover:bg-green-600!"
-      >
-        {title}
-      </Button>
-    );
-
-  if (theme === "sad")
-    return (
-      <Button
-        danger
-        onClick={payNow}
-        size="large"
-        type="primary"
-        className="font-medium! w-full! py-6! text-lg!"
-      >
-        {title}
-      </Button>
-    );
+  return (
+    <>
+      {theme === "happy" ? (
+        <Button
+          onClick={payNow}
+          size="large"
+          type="primary"
+          className="font-medium! w-full! py-6! text-lg! bg-green-500! hover:bg-green-600!"
+        >
+          {title}
+        </Button>
+      ) : (
+        <Button
+          danger
+          onClick={payNow}
+          size="large"
+          type="primary"
+          className="font-medium! w-full! py-6! text-lg!"
+        >
+          {title}
+        </Button>
+      )}
+      <Modal open={open} width={"50%"} footer={null} onCancel={()=>setOpen(false)}>
+        <Result
+        status="error"
+        title="Purchase Failed"
+        subTitle="An error occured during payment capture"
+        extra={[
+          <Link href={"/"}>
+          <Button type="primary">Go back</Button>
+          </Link>
+        ]}
+        />
+      </Modal>
+    </>
+  );
 };
 
 export default Pay;

@@ -1,118 +1,72 @@
 "use client";
 
-import { Avatar, Select, Skeleton, Table } from "antd";
+import fetcher from "@/lib/fetcher";
+import Image from "next/image";
+import { Card, Skeleton, Tag } from "antd";
 import moment from "moment";
-
-const data = [
-  {
-    orderId: "ORD1001",
-    userId: "USR001",
-    product: {
-      productId: "P001",
-      productName: "Wireless Mouse",
-      quantity: 2,
-      price: 29.99,
-    },
-    totalAmount: 59.98,
-    status: "pending",
-    createdAt: "2025-06-05T10:00:00Z",
-  },
-  {
-    orderId: "ORD1002",
-    userId: "USR002",
-    product: {
-      productId: "P003",
-      productName: "Bluetooth Headphones",
-      quantity: 1,
-      price: 59.99,
-    },
-    totalAmount: 59.99,
-    status: "success",
-    createdAt: "2025-06-04T12:45:00Z",
-  },
-  {
-    orderId: "ORD1003",
-    userId: "USR003",
-    product: {
-      productId: "P002",
-      productName: "USB-C Charger",
-      quantity: 3,
-      price: 29.99,
-    },
-    totalAmount: 89.97,
-    status: "error",
-    createdAt: "2025-06-03T14:30:00Z",
-  },
-  {
-    orderId: "ORD1004",
-    userId: "USR004",
-    product: {
-      productId: "P004",
-      productName: "Laptop Stand",
-      quantity: 1,
-      price: 49.99,
-    },
-    totalAmount: 49.99,
-    status: "warning",
-    createdAt: "2025-06-02T16:00:00Z",
-  },
-];
+import useSWR from "swr";
+import calculatePrice from "@/lib/price-calculate";
 
 const Orders = () => {
-  const columns = [
-    {
-      title: "Customer",
-      key: "customer",
-      render: () => (
-        <div className="flex gap-3 items-center">
-          <Avatar size={"large"} className="bg-orange-500!">
-            M
-          </Avatar>
-          <div className="flex flex-col">
-            <h1 className="font-medium">Manmohan</h1>
-            <label className="text-gray-500">email@gmail.com</label>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Product",
-      key: "product",
-      render: (item: any) => <label>{item.product.productName}</label>,
-    },
-    {
-      title: "Price",
-      key: "price",
-      render: (item: any) => <label>{"₹ " + item.product.price}</label>,
-    },
-    {
-      title: "Address",
-      key: "address",
-      render: () => <label>Dumka,Jharkhand</label>,
-    },
-    {
-      title: "Status",
-      key: "status",
-      render: () => (
-        <Select placeholder="Status" style={{ width: 150 }}>
-          <Select.Option value="processing">Processing</Select.Option>
-          <Select.Option value="dispatched">Dispatched</Select.Option>
-          <Select.Option value="returned">Returned</Select.Option>
-        </Select>
-      ),
-    },
-    {
-      title: "Date",
-      key: "date",
-      render: (item: any) => (
-        <label>{moment(item.createdAt).format("MMM DD, YYYY hh:mm A")}</label>
-      ),
-    },
-  ];
+  const { data, error, isLoading } = useSWR("/api/order", fetcher);
+
+  console.log(data);
+
+  if (error) {
+    return <h1>{error.message}</h1>;
+  }
+
+  if (isLoading) return <Skeleton active />;
 
   return (
-    <div>
-      <Table columns={columns} dataSource={data} rowKey={"orderId"} />
+    <div className="flex flex-col gap-8">
+      {data.map((item: any, index: number) => (
+        <Card
+          key={index}
+          title={item._id}
+          extra={
+            <label className="text-gray-500">
+              {moment(item.createdAt).format("MMM DD, YYYY hh:mm A")}
+            </label>
+          }
+        >
+          <div className="flex flex-col gap-8">
+            {item.products.map((product: any, pIndex: number) => (
+              <Card key={pIndex} hoverable>
+                <div className="flex justify-between">
+                  <div className="flex gap-3">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      width={150}
+                      height={90}
+                    />
+                    <div>
+                      <h1 className="text-lg font-medium capitalize">
+                        {product.title}
+                      </h1>
+                      <div className="flex gap-3 items-center mb-2">
+                        <label className="font-medium text-base">
+                          ₹
+                          {calculatePrice(
+                            item.prices[pIndex],
+                            item.discounts[pIndex]
+                          )}
+                        </label>
+                        <del className="text-gray-500">
+                          ₹{item.prices[pIndex]}
+                        </del>
+                        <label>{item.discounts[pIndex]}% Off</label>
+                      </div>
+                      <Tag>{item.status.toUpperCase()}</Tag>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Card>
+      ))}
     </div>
   );
 };
