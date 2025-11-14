@@ -4,6 +4,7 @@ import calculatePrice from "@/lib/price-calculate";
 import { Button, Card, Empty } from "antd";
 import Image from "next/image";
 import { FC } from "react";
+import Pay from "./shared/Pay";
 
 interface TitleInterface extends DataInterface {
   title: string;
@@ -30,13 +31,7 @@ const Slug: FC<DataInterface> = ({ data, title }) => {
               <del className="text-gray-500">₹{data.price}</del>
               <h1 className="text-rose-500">({data.discount}% Off)</h1>
             </div>
-            <Button
-              className="bg-green-500! font-medium! text-xl! py-6! px-24!"
-              type="primary"
-              size="large"
-            >
-              Buy now
-            </Button>
+            <Pay title="Buy now" product={data} theme="happy"/>
           </div>
         </div>
       </Card>

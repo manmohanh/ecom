@@ -11,10 +11,7 @@ import useSWR, { mutate } from "swr";
 import { useSession } from "next-auth/react";
 import Pay from "../shared/Pay";
 
-
-
 const Carts = () => {
-
   const { data, error, isLoading } = useSWR("/api/cart", fetcher);
 
   const [loading, setLoading] = useState({
@@ -74,8 +71,6 @@ const Carts = () => {
 
     return sum;
   };
-
-
 
   if (data.length === 0) return <Empty />;
 
@@ -148,7 +143,14 @@ const Carts = () => {
         <h1 className="text-2xl font-semibold">
           Total Payable amount - ₹{getTotalAmout().toLocaleString()}
         </h1>
-        <Pay data={data}/>
+        <div className="w-[300px]">
+          <Pay
+            theme="sad"
+            product={data}
+            onSuccess={(x) => console.log(x)}
+            onFailed={(x) => console.log(x)}
+          />
+        </div>
       </div>
     </div>
   );

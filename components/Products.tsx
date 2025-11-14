@@ -1,10 +1,10 @@
 "use client";
 import DataInterface from "@/interface/data.interface";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { Button, Card, message, Pagination, Popconfirm, Tag } from "antd";
+import { Button, Card, message} from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useState } from "react";
+import { FC } from "react";
 import "@ant-design/v5-patch-for-react-19";
 import clientCatchError from "@/lib/client-catch-error";
 import axios from "axios";
@@ -15,20 +15,14 @@ import { mutate } from "swr";
 const Products: FC<DataInterface> = ({ data }) => {
   const router = useRouter();
 
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6);
 
-  const onPaginate = (page: number, limit: number) => {
-    setPage(page);
-    setLimit(limit);
-  };
 
   const addToCart = async (id: string) => {
     try {
       const session = await getSession();
       if (!session) return router.push("/login");
 
-      const { data } = await axios.post(`/api/cart`, { product: id });
+      await axios.post(`/api/cart`, { product: id });
       message.success("Added to cart")
       mutate("/api/cart?count=true")
     } catch (error) {
@@ -98,15 +92,7 @@ const Products: FC<DataInterface> = ({ data }) => {
           </Card>
         ))}
       </div>
-      <div className="flex justify-end">
-        <Pagination
-          total={data.total}
-          onChange={onPaginate}
-          current={page}
-          pageSizeOptions={[6, 8, 14, 20]}
-          defaultPageSize={limit}
-        />
-      </div>
+   
     </div>
   );
 };
