@@ -85,6 +85,7 @@ export const POST = async (req: NextRequest) => {
       process.env.NODE_ENV === "development"
     ) {
       const orderId = await createOrder({ user, ...orders });
+    
       if (!orderId)
         return res.json({ success: "Failed to create order" }, { status: 424 });
 

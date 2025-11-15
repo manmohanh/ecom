@@ -10,8 +10,12 @@ import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { useSession } from "next-auth/react";
 import Pay from "../shared/Pay";
+import { useRouter } from "next/navigation";
 
 const Carts = () => {
+
+  const router = useRouter()
+
   const { data, error, isLoading } = useSWR("/api/cart", fetcher);
 
   const [loading, setLoading] = useState({
@@ -147,7 +151,7 @@ const Carts = () => {
           <Pay
             theme="sad"
             product={data}
-            onSuccess={(x) => console.log(x)}
+            onSuccess={(x) => router.push('/user/orders')}
             onFailed={(x) => console.log(x)}
           />
         </div>

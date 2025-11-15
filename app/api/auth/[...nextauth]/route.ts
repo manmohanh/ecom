@@ -58,6 +58,7 @@ export const authOptions: NextAuthOptions = {
           user.email = data.email;
           user.name = data.name;
           user.role = data.role;
+          user.address = data.address
           return true;
         } catch (error) {
           return false;
@@ -70,6 +71,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.address = user.address
       }
       return token;
     },
@@ -77,6 +79,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.address = token.address as any
       }
       return session;
     },

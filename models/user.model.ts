@@ -18,6 +18,13 @@ const userSchema = new Schema(
     role: {
       type: String,
     },
+    address:{
+      street:{type:String,default:null},
+      city:{type:String,default:null},
+      state:{type:String,default:null},
+      country:{type:String,default:null},
+      pincode:{type:Number,default:null},
+    }
   },
   { timestamps: true }
 );

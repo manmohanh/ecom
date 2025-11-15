@@ -2,7 +2,7 @@
 
 import fetcher from "@/lib/fetcher";
 import Image from "next/image";
-import { Card, Skeleton, Tag } from "antd";
+import { Card, Divider, Skeleton, Tag } from "antd";
 import moment from "moment";
 import useSWR from "swr";
 import calculatePrice from "@/lib/price-calculate";
@@ -10,13 +10,29 @@ import calculatePrice from "@/lib/price-calculate";
 const Orders = () => {
   const { data, error, isLoading } = useSWR("/api/order", fetcher);
 
-  console.log(data);
-
   if (error) {
     return <h1>{error.message}</h1>;
   }
 
   if (isLoading) return <Skeleton active />;
+
+  const getStatusColor = (status: string) => {
+    if (status === "processing") return "#2db7f5";
+
+    if (status === "dispatched") return "#87d068";
+
+    if (status === "returned") return "#f50";
+  };
+
+  const totalPrice = (item: any) => {
+    let sum = 0;
+    for (let i = 0; i < item.products.length; i++) {
+      sum +=
+        calculatePrice(item.prices[i], item.discounts[i]) * item.quantities[i];
+    }
+
+    return sum;
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -41,6 +57,7 @@ const Orders = () => {
                       width={150}
                       height={90}
                     />
+
                     <div>
                       <h1 className="text-lg font-medium capitalize">
                         {product.title}
@@ -57,14 +74,24 @@ const Orders = () => {
                           ₹{item.prices[pIndex]}
                         </del>
                         <label>{item.discounts[pIndex]}% Off</label>
+                        <label className="text-gray-500 font-medium">
+                          {item.quantities[pIndex]} Pcs
+                        </label>
                       </div>
-                      <Tag>{item.status.toUpperCase()}</Tag>
+
+                      <Tag color={getStatusColor(item.status)}>
+                        {item.status.toUpperCase()}
+                      </Tag>
                     </div>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
+          <Divider />
+          <h1 className="text-3xl font-bold">
+            Total : ₹{totalPrice(item).toLocaleString()}
+          </h1>
         </Card>
       ))}
     </div>

@@ -7,6 +7,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { FC, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ModifiedRazorpayInterface extends RazorpayOrderOptions {
   notes: any;
@@ -52,6 +53,7 @@ const Pay: FC<PayInterface> = ({
   onFailed,
   theme = "happy",
 }) => {
+  const router = useRouter()
   const [open, setOpen] = useState(false);
   const isArray = Array.isArray(product);
   const session = useSession();
@@ -73,12 +75,14 @@ const Pay: FC<PayInterface> = ({
     const products = [];
     const prices = [];
     const discounts = [];
+    const quantities = []
 
     if (!isArray) {
       return {
         products: [product._id],
         prices: [product.price],
         discounts: [product.discount],
+        quantities:[1]
       };
     }
 
@@ -86,12 +90,14 @@ const Pay: FC<PayInterface> = ({
       products.push(item.product._id);
       prices.push(item.product.price);
       discounts.push(item.product.discount);
+      quantities.push(item.qnt)
     }
 
     return {
       products,
       prices,
       discounts,
+      quantities
     };
   };
 
@@ -104,6 +110,12 @@ const Pay: FC<PayInterface> = ({
   const payNow = async () => {
     try {
       if (!session.data) throw new Error("Session not intialized");
+
+      if(!session.data.user.address.city)
+      {
+        sessionStorage.setItem("message","Please update your address first")
+        return router.push('/user/settings')
+      }
 
       const payload = {
         amount: isArray ? getTotalAmout() : product.price,

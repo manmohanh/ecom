@@ -21,6 +21,7 @@ export const POST = async (req: NextRequest) => {
       name: user.fullname,
       email: user.email,
       role: user.role,
+      address:user.address
     };
 
     if (provider === "google") return res.json(payload);

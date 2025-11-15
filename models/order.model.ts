@@ -9,27 +9,39 @@ const orderSchema = new Schema(
       ref: UserModel,
       required: true,
     },
-    products: [{
-      type: mongoose.Types.ObjectId,
-      ref: ProductModel,
-      required: true,
-    }],
-    prices: [{
-      type: Number,
-      required: true,
-    }],
-    discounts: [{
-      type: Number,
-      required: true,
-    }],
-    status:{
-        type:String,
-        default:'processing',
-        enum:['processing','dispatched','returned']
-    }
+    products: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: ProductModel,
+        required: true,
+      },
+    ],
+    prices: [
+      {
+        type: Number,
+        required: true,
+      },
+    ],
+    discounts: [
+      {
+        type: Number,
+        required: true,
+      },
+    ],
+    quantities: [
+      {
+        type: Number,
+        required: true,
+      },
+    ],
+    status: {
+      type: String,
+      default: "processing",
+      enum: ["processing", "dispatched", "returned"],
+    },
   },
   { timestamps: true }
 );
 
-const OrderModel = models.Order || model("Order",orderSchema)
+const OrderModel = models.Order || model("Order", orderSchema);
 export default OrderModel;

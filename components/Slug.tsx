@@ -34,14 +34,16 @@ const Slug: FC<DataInterface> = ({ data, title }) => {
               <del className="text-gray-500">₹{data.price}</del>
               <h1 className="text-rose-500">({data.discount}% Off)</h1>
             </div>
-            <Pay
-              title="Buy now"
-              product={data}
-              theme="happy"
-              onSuccess={() => {
-                router.push("/user/orders");
-              }}
-            />
+            <div className="w-[200px]">
+              <Pay
+                title="Buy now"
+                product={data}
+                theme="happy"
+                onSuccess={() => {
+                  router.push("/user/orders");
+                }}
+              />
+            </div>
           </div>
         </div>
       </Card>
