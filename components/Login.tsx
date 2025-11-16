@@ -11,31 +11,42 @@ import clientCatchError from "@/lib/client-catch-error";
 import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [loading, setLoding] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const login = async (value: any) => {
-    try {
-      const payload = {
-        ...value,
-        redirect: false,
-      };
-      signIn("credentials", payload);
-      const session = await getSession();
+ const login = async (value: any) => {
+  try {
+    setLoading(true);
+    const payload = {
+      ...value,
+      redirect: false,
+    };
+    
+    const result = await signIn("credentials", payload);
 
-      if (!session) throw new Error("Failed to login user");
+    console.log(result)
 
-      if (session.user.role === "user") {
-        return router.replace("/");
-      }
-
-      if (session.user.role === "admin") {
-        return router.replace("/admin/orders");
-      }
-    } catch (error) {
-      clientCatchError(error);
+    if (result?.error) {
+      throw new Error(result.error);
     }
-  };
+    
+    const session = await getSession();
+
+    if (!session) throw new Error("Failed to login user");
+
+    if (session.user.role === "user") {
+      return router.replace("/");
+    }
+
+    if (session.user.role === "admin") {
+      return router.replace("/admin/orders");
+    }
+  } catch (error) {
+    clientCatchError(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const signInWithGoogle = async () => {
     try {
@@ -96,6 +107,7 @@ const Login = () => {
 
               <Form.Item>
                 <Button
+                loading={loading}
                   htmlType="submit"
                   size="large"
                   type="primary"

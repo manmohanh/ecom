@@ -51,9 +51,7 @@ export const authOptions: NextAuthOptions = {
             `${process.env.SERVER}/api/user/login`,
             payload
           );
-
-          console.log(data);
-
+          
           user.id = data.id;
           user.email = data.email;
           user.name = data.name;

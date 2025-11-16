@@ -121,7 +121,6 @@ const Pay: FC<PayInterface> = ({
         amount: isArray ? getTotalAmout() : product.price,
       };
       const { data } = await axios.post("/api/razorpay/order", payload);
-      console.log(data);
       const options: ModifiedRazorpayInterface = {
         name: "Ecom shops",
         description: "Bulk prodcut",

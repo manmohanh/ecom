@@ -21,6 +21,7 @@ const UserLayout: FC<ChildrenInterface> = ({ children }) => {
 
   const session = useSession();
 
+
   const logout = async () => {
     await signOut();
   };
@@ -47,20 +48,22 @@ const UserLayout: FC<ChildrenInterface> = ({ children }) => {
     <Layout hasSider className="min-h-screen">
       <Sider width={300} className="h-screen border-r border-r-slate-100">
         <Menu theme="light" mode="inline" items={menus} className="h-full" />
-        <div className="bg-indigo-900 p-4 fixed bottom-0 left-0 w-[300px] flex items-center gap-3">
-          <Avatar className="h-16! w-16! bg-orange-800! text-2xl! font-medium!">
-            {session.data?.user.name?.charAt(0)}
-          </Avatar>
-          <div className="flex flex-col">
-            <h1 className="text-lg text-white font-medium">
-              {session.data?.user.name}
-            </h1>
-            <p className="text-gray-300 mb-3">{session.data?.user.email}</p>
-            <Button onClick={logout} icon={<LogoutOutlined />}>
-              Logout
-            </Button>
+        {session.data && (
+          <div className="bg-indigo-900 p-4 fixed bottom-0 left-0 w-[300px] flex items-center gap-3">
+            <Avatar className="h-16! w-16! bg-orange-800! text-2xl! font-medium!">
+              {session.data?.user.name?.charAt(0)}
+            </Avatar>
+            <div className="flex flex-col">
+              <h1 className="text-lg text-white font-medium capitalize">
+                {session.data?.user.name}
+              </h1>
+              <p className="text-gray-300 mb-3">{session.data?.user.email}</p>
+              <Button onClick={logout} icon={<LogoutOutlined />}>
+                Logout
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </Sider>
       <Layout>
         <Content>

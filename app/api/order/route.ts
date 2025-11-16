@@ -41,7 +41,7 @@ export const GET = async (req: NextRequest) => {
     if (role === "admin")
       orders = await OrderModel.find()
         .sort({ createdAt: -1 }) 
-        .populate("user", "fullname email mobile")
+        .populate("user", "fullname email mobile address")
         .populate("products");
 
     return res.json(orders);

@@ -1,12 +1,16 @@
 "use client";
+import clientCatchError from "@/lib/client-catch-error";
 import { SaveOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input, InputNumber, message } from "antd";
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import React from "react";
 
 const Settings = () => {
-  const [userForm] = Form.useForm()
-  const session = useSession()
+  const [userForm] = Form.useForm();
+  const session = useSession();
+
+  console.log(session);
 
   React.useEffect(() => {
     const msg = sessionStorage.getItem("message");
@@ -16,24 +20,43 @@ const Settings = () => {
     }
   }, []);
 
-  React.useEffect(()=>{
-    if(session.data){
-      const user = session.data.user
+  React.useEffect(() => {
+    if (session.data) {
+      const user = session.data.user;
       userForm.setFieldsValue({
-        fullname:user.name,
-        ...user.address
-      })
+        fullname: user.name,
+        ...user.address,
+      });
     }
-  },[session])
+  }, [session]);
 
+  const saveChanges = async (values: any) => {
+    try {
+      const payload = {
+        fullname: values.fullname,
+        address: {
+          street: values.street,
+          city: values.city,
+          state: values.state,
+          country: values.country,
+          pincode: values.pincode,
+        },
+      };
 
+      await axios.put("/api/user/profile", payload);
+      await session.update();
+      message.success("Profile Info saved !");
+    } catch (error) {
+      clientCatchError(error);
+    }
+  };
 
   return (
     <div>
       <h1 className="text-lg font-medium">Profile Information</h1>
       <Divider />
       <div>
-        <Form layout="vertical" form={userForm}>
+        <Form layout="vertical" form={userForm} onFinish={saveChanges}>
           <div className="grid grid-cols-2 gap-8">
             <Form.Item
               label="Fullname"
@@ -111,7 +134,15 @@ const Settings = () => {
             </Form.Item>
           </div>
           <Form.Item>
-            <Button htmlType="submit" size="large" type="primary" danger icon={<SaveOutlined/>}>Save now</Button>
+            <Button
+              htmlType="submit"
+              size="large"
+              type="primary"
+              danger
+              icon={<SaveOutlined />}
+            >
+              Save now
+            </Button>
           </Form.Item>
         </Form>
       </div>
