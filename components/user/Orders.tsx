@@ -2,7 +2,7 @@
 
 import fetcher from "@/lib/fetcher";
 import Image from "next/image";
-import { Card, Divider, Skeleton, Tag } from "antd";
+import { Card, Divider, Empty, Skeleton, Tag } from "antd";
 import moment from "moment";
 import useSWR from "swr";
 import calculatePrice from "@/lib/price-calculate";
@@ -24,15 +24,8 @@ const Orders = () => {
     if (status === "returned") return "#f50";
   };
 
-  const totalPrice = (item: any) => {
-    let sum = 0;
-    for (let i = 0; i < item.products.length; i++) {
-      sum +=
-        calculatePrice(item.prices[i], item.discounts[i]) * item.quantities[i];
-    }
-
-    return sum;
-  };
+  if(data.length === 0)
+    return <Empty description="No orders found !" />
 
   return (
     <div className="flex flex-col gap-8">
@@ -90,7 +83,7 @@ const Orders = () => {
           </div>
           <Divider />
           <h1 className="text-3xl font-bold">
-            Total : ₹{totalPrice(item).toLocaleString()}
+            Total : ₹{item.grossTotal.toLocaleString()}
           </h1>
         </Card>
       ))}

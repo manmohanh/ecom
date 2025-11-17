@@ -15,8 +15,6 @@ const Orders = () => {
 
   if (isLoading) return <Skeleton active />;
 
-  console.log(data);
-
   if (error)
     return <h1 className="text-rose-500 font-medium">{error.message}</h1>;
 
@@ -170,6 +168,7 @@ const Orders = () => {
         columns={columns}
         dataSource={data}
         rowKey={"_id"}
+        scroll={{x:'max-content'}}
         expandable={{
           expandedRowRender: browseProducts,
           rowExpandable: (record: any) => record.name !== "Not Expandable",

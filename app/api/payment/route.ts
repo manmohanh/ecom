@@ -28,13 +28,13 @@ export const GET = async (req: NextRequest) => {
     const payments = await PaymentModel.find()
       .sort({ createdAt: -1 })
       .populate("user", "fullname email")
-      .populate({
-        path: "order",
-        populate: {
-          path: "product",
-          model: "Product",
-        },
-      });
+      // .populate({
+      //   path: "order",
+      //   populate: {
+      //     path: "products",
+      //     model: "Product",
+      //   },
+      // });
     return res.json(payments);
   } catch (error) {
     return serverCatchError(error);

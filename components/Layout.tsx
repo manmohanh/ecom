@@ -34,7 +34,10 @@ const Layout: FC<ChildrenInterface> = ({ children }) => {
 
   const session = useSession();
 
-  const { data } = useSWR("/api/cart?count=true", fetcher);
+  const { data } = useSWR(
+    session.data?.user.role === "user" ? "/api/cart?count=true" : null,
+    session.data?.user.role === "user" ? fetcher : null
+  );
 
   const blacklists = ["/admin", "/login", "/signup", "/user"];
 

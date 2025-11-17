@@ -6,20 +6,19 @@ import moment from "moment";
 import useSWR from "swr";
 
 const Payments = () => {
+  const { data, error, isLoading } = useSWR("/api/payment", fetcher);
 
-  const {data,error,isLoading} = useSWR('/api/payment',fetcher)
+  console.log(data);
 
-  if(isLoading)
-    return <Skeleton active/>
+  if (isLoading) return <Skeleton active />;
 
-  if(error)
-    return <h1>{error.message}</h1>
+  if (error) return <h1>{error.message}</h1>;
 
   const columns = [
     {
       title: "Customer",
       key: "customer",
-      render: (item:any) => (
+      render: (item: any) => (
         <div className="flex gap-3 items-center">
           <Avatar size={"large"} className="bg-orange-500!">
             {item.user.fullname[0]}
@@ -32,35 +31,71 @@ const Payments = () => {
       ),
     },
     {
-      title: "Product",
-      key: "product",
-      render: (item: any) => <label>{item.order.product.title}</label>,
+      title: "Order ID",
+      key: "orderId",
+      dataIndex: "order",
+    },
+    {
+      title: "Payment ID",
+      key: "paymentId",
+      dataIndex: "paymentId",
     },
     {
       title: "Amount",
       key: "amount",
-      render: (item: any) => <label>{"₹ " + item.order.price}</label>,
+      render: (item: any) => <label>₹{item.amount.toLocaleString()}</label>,
     },
     {
-      title:'Vendor',
-      key:'vendor',
-
-      render:(item:any)=>{
-        <Tag>{item.vendor}</Tag>
-      }
+      title: "Fee",
+      key: "fee",
+      render: (item: any) => (item.fee ? <label>₹{item.fee}</label> : 0),
     },
     {
-      title:"Date",
-      key:"date",
-      render:(item:any)=>(
-        <label>{moment(item.createdAt).format("MMM DD, YYYY hh:mm A")}</label>
-      )
-    }
+      title: "Tax",
+      key: "tax",
+      render: (item: any) => (item.tax ? <label>₹{item.tax}</label> : 0),
+    },
+    {
+      title: "Date",
+      key: "date",
+      render: (item: any) => moment(item.createdAt).format("MMM DD,YYYY"),
+    },
+    {
+      title: "Method",
+      key: "method",
+      render: (item: any) => (
+        <Tag className="uppercase" color="volcano">
+          {item.method}
+        </Tag>
+      ),
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (item: any) => (
+        <>
+          {item.status === "captured" ? (
+            <Tag className="uppercase" color="green">
+              {item.status}
+            </Tag>
+          ) : (
+            <Tag className="uppercase" color="magenta">
+              {item.status}
+            </Tag>
+          )}
+        </>
+      ),
+    },
   ];
 
   return (
     <div>
-      <Table columns={[]} dataSource={data} rowKey={"_id"}/>
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey={"_id"}
+        scroll={{ x: "max-content" }}
+      />
     </div>
   );
 };

@@ -16,11 +16,19 @@ import { FC } from "react";
 import { getBreadCrumbs } from "../admin/AdminLayout";
 import { signOut, useSession } from "next-auth/react";
 
+const siderStyle: React.CSSProperties = {
+  overflow: "auto",
+  height: "100vh",
+  position: "sticky",
+  insetInlineStart: 0,
+  top: 0,
+  bottom: 0,
+};
+
 const UserLayout: FC<ChildrenInterface> = ({ children }) => {
   const pathname = usePathname();
 
   const session = useSession();
-
 
   const logout = async () => {
     await signOut();
@@ -30,24 +38,30 @@ const UserLayout: FC<ChildrenInterface> = ({ children }) => {
     {
       icon: <ShoppingOutlined />,
       label: <Link href="/user/carts">Cart</Link>,
-      key: "cart",
+      key: "/user/carts",
     },
     {
       icon: <ReconciliationOutlined />,
       label: <Link href="/user/orders">Orders</Link>,
-      key: "orders",
+      key: "/user/orders",
     },
     {
       icon: <SettingOutlined />,
       label: <Link href="/user/settings">Settings</Link>,
-      key: "settings",
+      key: "/user/settings",
     },
   ];
 
   return (
     <Layout hasSider className="min-h-screen">
-      <Sider width={300} className="h-screen border-r border-r-slate-100">
-        <Menu theme="light" mode="inline" items={menus} className="h-full" />
+      <Sider width={300} style={siderStyle}>
+        <Menu
+          theme="light"
+          mode="inline"
+          items={menus}
+          className="h-full"
+          selectedKeys={[pathname]}
+        />
         {session.data && (
           <div className="bg-indigo-900 p-4 fixed bottom-0 left-0 w-[300px] flex items-center gap-3">
             <Avatar className="h-16! w-16! bg-orange-800! text-2xl! font-medium!">

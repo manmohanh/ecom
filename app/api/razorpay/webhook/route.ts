@@ -18,6 +18,12 @@ interface CreatePaymentInterface {
   user: string;
   order: string;
   paymentId: string;
+  tax: number;
+  fee: number;
+  status: string;
+  method: string;
+  currency: string;
+  amount: number;
   vendor?: "razorpay" | "stripe";
 }
 
@@ -58,7 +64,7 @@ export const deleteCarts = async (carts: DeleteCartsInterface) => {
       user: carts.user,
       product: id,
     }));
-    await CartModel.deleteMany({$or:query});
+    await CartModel.deleteMany({ $or: query });
   } catch (err) {
     return createLogs(err, "delete-cart");
   }
@@ -69,6 +75,9 @@ export const POST = async (req: NextRequest) => {
     const signature = req.headers.get("x-razorpay-signature");
     const body = await req.json();
     const user = body.payload.payment.entity.notes.user;
+    const paymentId = body.payload.payment.entity.id;
+    const { tax, fee, currency, status, method } = body.payload.payment.entity;
+    const grossTotal = body.payload.payment.entity.amount / 100;
     const orders = JSON.parse(body.payload.payment.entity.notes.orders);
 
     const mySignature = crypto
@@ -84,15 +93,21 @@ export const POST = async (req: NextRequest) => {
       body.event === "payment.authorized" &&
       process.env.NODE_ENV === "development"
     ) {
-      const orderId = await createOrder({ user, ...orders });
-    
+      const orderId = await createOrder({ user, ...orders, grossTotal });
+
       if (!orderId)
         return res.json({ success: "Failed to create order" }, { status: 424 });
 
       const payment = await createPayment({
         user,
         order: orderId,
-        paymentId: body.payload.payment.entity.id,
+        paymentId,
+        tax,
+        fee,
+        currency,
+        status,
+        method,
+        amount: grossTotal,
       });
 
       if (!payment)
@@ -106,15 +121,21 @@ export const POST = async (req: NextRequest) => {
     }
 
     // if (body.event === "payment.captured") {
-    //   const orderId = await createOrder({ user, ...orders });
+    //   const orderId = await createOrder({ user, ...orders,grossTotal });
     //   if (!orderId)
     //     return res.json({ success: "Failed to create order" }, { status: 424 });
 
-    //   const payment = await createPayment({
-    //     user,
-    //     order: orderId,
-    //     paymentId: body.payload.payment.entity.id,
-    //   });
+    //  const payment = await createPayment({
+    //       user,
+    //       order: orderId,
+    //       paymentId,
+    //       tax,
+    //       fee,
+    //       currency,
+    //       status,
+    //       method,
+    //       amount: grossTotal,
+    //     });
 
     //   if (!payment)
     //     return res.json(

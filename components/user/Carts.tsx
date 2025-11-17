@@ -2,7 +2,12 @@
 import clientCatchError from "@/lib/client-catch-error";
 import fetcher from "@/lib/fetcher";
 import calculatePrice from "@/lib/price-calculate";
-import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  MinusOutlined,
+  PlusOutlined,
+  ShopOutlined,
+} from "@ant-design/icons";
 import { Button, Card, Empty, Skeleton, Space } from "antd";
 import axios from "axios";
 import Image from "next/image";
@@ -11,10 +16,10 @@ import useSWR, { mutate } from "swr";
 import { useSession } from "next-auth/react";
 import Pay from "../shared/Pay";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Carts = () => {
-
-  const router = useRouter()
+  const router = useRouter();
 
   const { data, error, isLoading } = useSWR("/api/cart", fetcher);
 
@@ -76,7 +81,17 @@ const Carts = () => {
     return sum;
   };
 
-  if (data.length === 0) return <Empty />;
+  if (data.length === 0)
+    return (
+      <div className="text-center space-y-6">
+        <Empty description="Your cart is empty" />
+        <Link href={"/"}>
+          <Button type="primary" icon={<ShopOutlined />} size="large">
+            Shop now
+          </Button>
+        </Link>
+      </div>
+    );
 
   return (
     <div className="flex flex-col gap-12">
@@ -151,7 +166,7 @@ const Carts = () => {
           <Pay
             theme="sad"
             product={data}
-            onSuccess={(x) => router.push('/user/orders')}
+            onSuccess={(x) => router.push("/user/orders")}
             onFailed={(x) => console.log(x)}
           />
         </div>

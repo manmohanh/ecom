@@ -118,7 +118,7 @@ const Pay: FC<PayInterface> = ({
       }
 
       const payload = {
-        amount: isArray ? getTotalAmout() : product.price,
+        amount: isArray ? getTotalAmout() : calculatePrice(product.price,product.discount),
       };
       const { data } = await axios.post("/api/razorpay/order", payload);
       const options: ModifiedRazorpayInterface = {
